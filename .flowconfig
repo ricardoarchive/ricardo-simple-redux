@@ -1,0 +1,9 @@
+[ignore]
+./build/.*
+
+[include]
+./src
+
+[options]
+module.system=haste
+esproposal.decorators=ignore

@@ -1,0 +1,16 @@
+node_modules
+build
+.npmrc
+
+.eslintcache
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# JetBrains ide folder
+.idea/
+
+# jest code coverage
+coverage
