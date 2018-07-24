@@ -1,7 +1,7 @@
 {
   "name": "ricardo-simple-redux",
   "private": false,
-  "version": "2.2.6",
+  "version": "2.2.7",
   "description": "Simple Redux",
   "main": "./build/index.js",
   "scripts": {
