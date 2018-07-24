@@ -3,7 +3,7 @@ import type { Axios } from 'axios'
 
 export type NeedsUpdate = any => any => boolean
 
-export type ActionRecipe = any => (getState: Function, api: Axios, dispatch: Function) => any
+export type ActionRecipe = (any => (getState: Function, api: Axios, dispatch: Function) => any) | {}
 
 export type actionNames = {
   success: string,
@@ -15,7 +15,7 @@ export type actionNames = {
 export type AdditionalConfigOptions = {
   before?: false | {},
   after?: false | {},
-  error?: false | ((e: Error) => any),
+  error?: false | ((e: any) => any),
 }
 
 export type ActionConfigType = {
