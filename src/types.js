@@ -7,20 +7,20 @@ export type ActionRecipe = any => (getState: Function, api: Axios, dispatch: Fun
 
 export type actionNames = {
   success: string,
-  error: ?(string | boolean),
-  after: ?(string | boolean),
-  before: ?(string | boolean),
+  error?: string | boolean,
+  after?: string | boolean,
+  before?: string | boolean,
 }
 
 export type AdditionalConfigOptions = {
-  before: ?(false | {}),
-  after: ?(false | {}),
-  error: ?(false | ((e: Error) => any)),
+  before?: false | {},
+  after?: false | {},
+  error?: false | ((e: Error) => any),
 }
 
 export type ActionConfigType = {
   action: ActionRecipe,
-  needsUpdate: ?NeedsUpdate,
+  needsUpdate?: NeedsUpdate,
 } & AdditionalConfigOptions
 
 export type Config = { initialState: Object } & AdditionalConfigOptions
