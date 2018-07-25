@@ -3,7 +3,7 @@ import type { Axios } from 'axios'
 
 export type NeedsUpdate = any => any => boolean
 
-export type ActionRecipe = (any => (getState: Function, api: Axios, dispatch: Function) => any)
+export type ActionRecipe = any => (getState: Function, api: Axios, dispatch: Function) => any
 
 export type actionNames = {
   success: string,
@@ -25,7 +25,6 @@ export type ActionConfigType = {
 
 export type Config = { initialState: Object } & AdditionalConfigOptions
 
-export type SRThunkAction = {
-  $call: ActionRecipe,
+export type SRThunkAction = ActionRecipe & {
   simpleRedux: { actionNames: actionNames } & ActionConfigType,
 }
