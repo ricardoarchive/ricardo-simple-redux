@@ -1,11 +1,9 @@
 // @flow
-import type { Axios } from 'axios'
-
 export type NeedsUpdate = (...any) => (...any) => boolean
 
-export type ActionRecipe = (
-  ...any
-) => (getState: Function, api: Axios, dispatch: Function) => Promise<any> | any
+export type ActionParams = { getState: Function, dispatch: Function, ...any }
+
+export type ActionRecipe = (...any) => ActionParams => Promise<any> | any
 
 export type ActionNames = {
   success: string,
@@ -17,7 +15,7 @@ export type ActionNames = {
 export type AdditionalConfigOptions = {
   before?: false | {},
   after?: false | {},
-  error?: false | ((e: any) => any),
+  error?: false | (({ error: any, ...ActionParams }) => any),
 }
 
 export type ActionConfigType = {
@@ -25,7 +23,12 @@ export type ActionConfigType = {
   needsUpdate?: NeedsUpdate,
 } & AdditionalConfigOptions
 
-export type Config = { initialState: Object } & AdditionalConfigOptions
+export type Config = {
+  initialState: Object,
+  getState: Function,
+  dispatch: Function,
+} & AdditionalConfigOptions &
+  ActionParams
 
 export type SRThunkAction = ActionRecipe & {
   simpleRedux: { actionNames: ActionNames } & ActionConfigType,

@@ -1,7 +1,12 @@
-// @flow
 import 'babel-polyfill'
-import type { Axios } from 'axios'
-import type { ActionConfigType, Config, AdditionalConfigOptions, SRThunkAction } from './types'
+import Action from './action'
+import type {
+  ActionConfigType,
+  Config,
+  AdditionalConfigOptions,
+  SRThunkAction,
+  ActionNames,
+} from './types'
 
 class SimpleRedux {
   actionRegister = {}
@@ -12,64 +17,30 @@ class SimpleRedux {
     error: false,
   }
 
-  constructor({ initialState, before, after, error }: Config) {
+  constructor({ initialState, before, after, error, getState, dispatch, ...rest }: Config) {
     this.initialState = initialState
-    this.generic = { before, after, error }
+    this.generic = { before, after, error, getState, dispatch, rest }
   }
 
-  factory = (
+  buildActionMetaObject = (
     type: string,
-    {
-      action: actionRecipe,
-      error: errorCallback,
-      before,
-      after,
-      needsUpdate: uniqueIdFunction,
-    }: ActionConfigType
-  ): SRThunkAction => {
-    const thunkReadyAction = (...params: any) => {
-      // $FlowFixMe
-      const action = actionRecipe instanceof Function ? actionRecipe(...params) : () => actionRecipe
+    { before, after, action, error, needsUpdate }: ActionConfigType,
+    actionNames: ActionNames
+  ) => ({
+    actionNames,
+    action,
+    needsUpdate,
+    error,
+    before,
+    after,
+  })
 
-      return async (dispatch: Function, getState: Function, api: Axios) => {
-        const isUnique = !uniqueIdFunction || uniqueIdFunction(...params)(getState())
-        if (!isUnique) return Promise.resolve()
-        if (before) dispatch({ update: before, type: `${type}/before` })
-        try {
-          const update = await action(getState, api, dispatch)
-          dispatch({
-            type,
-            update,
-          })
-        } catch (error) {
-          if (errorCallback) {
-            dispatch({ update: errorCallback(error), type: `${type}/error` })
-          } else {
-            throw error
-          }
-        }
-
-        if (after) dispatch({ update: after, type: `${type}/after` })
-      }
-    }
-
-    // To allow cross store actions
-    thunkReadyAction.simpleRedux = {
-      actionNames: {
-        success: `${type}`,
-        error: errorCallback && `${type}/error`,
-        after: after && `${type}/after`,
-        before: before && `${type}/before`,
-      },
-      action: actionRecipe,
-      needsUpdate: uniqueIdFunction,
-      error: errorCallback,
-      before,
-      after,
-    }
-
-    return thunkReadyAction
-  }
+  getActionNames = (type: string, { before, after, action, error }: ActionConfigType) => ({
+    before: before && `${type}/before`,
+    success: type,
+    after: after && `${type}/after`,
+    error: error && `${type}/error`,
+  })
 
   reducer = (
     state: Object = this.initialState,
@@ -87,27 +58,47 @@ class SimpleRedux {
     throw new Error(message)
   }
 
-  actionFactory = (type: string, config: ActionConfigType): SRThunkAction => {
+  extendConfig = (config: ActionConfigType): ActionConfigType => {
     const error = config.error !== false ? config.error || this.generic.error : false
     const before = config.before !== false ? config.before || this.generic.before : false
     const after = config.after !== false ? config.after || this.generic.after : false
-    const extendedConfig = {
+    return {
       ...config,
       error,
       before,
       after,
     }
+  }
+
+  registerActions = (extendedConfig: ActionConfigType, type: string) => {
+    this.actionRegister[type] = true
+    if (extendedConfig.before) this.actionRegister[`${type}/before`] = true
+    if (extendedConfig.after) this.actionRegister[`${type}/after`] = true
+    if (extendedConfig.error) this.actionRegister[`${type}/error`] = true
+  }
+
+  actionFactory = (type: string, config: ActionConfigType): SRThunkAction => {
+    const extendedConfig = this.extendConfig(config)
     const doesActionExist = this.actionRegister[type]
+
     if (doesActionExist) {
       this.throw(`Action ${type} already exists. Action name has to be unique across the app`)
-    } else {
-      this.actionRegister[type] = true
-      if (extendedConfig.before) this.actionRegister[`${type}/before`] = true
-      if (extendedConfig.after) this.actionRegister[`${type}/after`] = true
-      if (extendedConfig.error) this.actionRegister[`${type}/error`] = true
     }
+    this.registerActions(extendedConfig, type)
 
-    return this.factory(type, extendedConfig)
+    const actionNames = this.getActionNames(type, extendedConfig)
+    const actionMetaData = this.buildActionMetaObject(type, extendedConfig, actionNames)
+    const ActionInstance = new Action({
+      type,
+      config: extendedConfig,
+      actionNames,
+      simpleReduxConfig: this.generic,
+    })
+    const action = ActionInstance.action
+
+    action.simpleRedux = actionMetaData
+
+    return action
   }
 }
 
