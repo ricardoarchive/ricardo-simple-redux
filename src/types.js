@@ -1,9 +1,11 @@
 // @flow
 import type { Axios } from 'axios'
 
-export type NeedsUpdate = any => any => boolean
+export type NeedsUpdate = (...any) => (...any) => boolean
 
-export type ActionRecipe = any => (getState: Function, api: Axios, dispatch: Function) => any
+export type ActionRecipe = (
+  ...any
+) => (getState: Function, api: Axios, dispatch: Function) => Promise<any> | any
 
 export type ActionNames = {
   success: string,
@@ -19,7 +21,7 @@ export type AdditionalConfigOptions = {
 }
 
 export type ActionConfigType = {
-  action: ActionRecipe | Object,
+  action: Object | ActionRecipe,
   needsUpdate?: NeedsUpdate,
 } & AdditionalConfigOptions
 
