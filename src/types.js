@@ -5,7 +5,7 @@ export type NeedsUpdate = any => any => boolean
 
 export type ActionRecipe = any => (getState: Function, api: Axios, dispatch: Function) => any
 
-export type actionNames = {
+export type ActionNames = {
   success: string,
   error?: string | boolean,
   after?: string | boolean,
@@ -19,12 +19,12 @@ export type AdditionalConfigOptions = {
 }
 
 export type ActionConfigType = {
-  action: ActionRecipe | {},
+  action: ActionRecipe | Object,
   needsUpdate?: NeedsUpdate,
 } & AdditionalConfigOptions
 
 export type Config = { initialState: Object } & AdditionalConfigOptions
 
 export type SRThunkAction = ActionRecipe & {
-  simpleRedux: { actionNames: actionNames } & ActionConfigType,
+  simpleRedux: { actionNames: ActionNames } & ActionConfigType,
 }
