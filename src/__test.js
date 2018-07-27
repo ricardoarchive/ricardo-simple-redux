@@ -2,9 +2,7 @@ import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 import SimpleRedux from './'
 
-const createTestStore = reducer => {
-  return createStore(reducer, applyMiddleware(thunk))
-}
+const createTestStore = reducer => createStore(reducer, applyMiddleware(thunk))
 
 describe('SimpleRedux', () => {
   const initialState = {

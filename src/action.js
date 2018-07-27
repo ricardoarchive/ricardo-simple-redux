@@ -17,7 +17,7 @@ class Action {
     this.action.simpleRedux = this.buildActionMetaObject(type, config, actionNames)
   }
 
-  getActionNames = (type: string, { before, after, action, error }: ActionConfigType) => ({
+  getActionNames = (type: string, { before, after, error }: ActionConfigType) => ({
     before: before && `${type}/before`,
     success: type,
     after: after && `${type}/after`,
