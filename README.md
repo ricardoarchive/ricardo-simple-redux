@@ -123,7 +123,8 @@ export const doSomething = simpleRedux.actionFactory('component/clear', {
 export default const reducer = simpleRedux.reducer
 ```
 
-# Additional properties of action returned by action factory (`simpleRedux.actionFactory(/*...*/).simpleRedux`):
+# Additional properties of action returned by action factory 
+(`simpleRedux.actionFactory(/*...*/).simpleRedux`):
 
 ```javascript
 export type SRThunkAction = {
