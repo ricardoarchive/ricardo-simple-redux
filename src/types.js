@@ -3,7 +3,9 @@ export type NeedsUpdate = (...any) => (...any) => boolean
 
 export type ActionParams = { getState: Function, dispatch: Function, ...any }
 
-export type ActionRecipe = (...any) => ActionParams => Promise<any> | any
+export type ActionRecipe = (
+  ...any
+) => (getState: Function, dispatch: Function, ...any) => Promise<any> | any
 
 export type ActionNames = {
   success: string,
@@ -25,11 +27,11 @@ export type ActionConfigType = {
 
 export type Config = {
   initialState: Object,
-  getState: Function,
-  dispatch: Function,
 } & AdditionalConfigOptions &
   ActionParams
 
+export type ActionMeta = { actionNames: ActionNames } & ActionConfigType
+
 export type SRThunkAction = ActionRecipe & {
-  simpleRedux: { actionNames: ActionNames } & ActionConfigType,
+  simpleRedux: ActionMeta,
 }

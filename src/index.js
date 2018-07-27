@@ -1,3 +1,4 @@
+// @flow
 import 'babel-polyfill'
 import Action from './action'
 import type {
@@ -17,36 +18,16 @@ class SimpleRedux {
     error: false,
   }
 
-  constructor({ initialState, before, after, error, getState, dispatch, ...rest }: Config) {
+  constructor({ initialState, before, after, error }: Config) {
     this.initialState = initialState
-    this.generic = { before, after, error, getState, dispatch, rest }
+    this.generic = { before, after, error }
   }
-
-  buildActionMetaObject = (
-    type: string,
-    { before, after, action, error, needsUpdate }: ActionConfigType,
-    actionNames: ActionNames
-  ) => ({
-    actionNames,
-    action,
-    needsUpdate,
-    error,
-    before,
-    after,
-  })
-
-  getActionNames = (type: string, { before, after, action, error }: ActionConfigType) => ({
-    before: before && `${type}/before`,
-    success: type,
-    after: after && `${type}/after`,
-    error: error && `${type}/error`,
-  })
 
   reducer = (
     state: Object = this.initialState,
     { update, type }: { update: Object, type: string }
   ) => {
-    const updateBelongsToInstance = this.actionRegister[type]
+    const updateBelongsToInstance = !!this.actionRegister[type]
     if (!updateBelongsToInstance || !update) return state
     return {
       ...state,
@@ -85,18 +66,11 @@ class SimpleRedux {
       this.throw(`Action ${type} already exists. Action name has to be unique across the app`)
     }
     this.registerActions(extendedConfig, type)
-
-    const actionNames = this.getActionNames(type, extendedConfig)
-    const actionMetaData = this.buildActionMetaObject(type, extendedConfig, actionNames)
     const ActionInstance = new Action({
       type,
       config: extendedConfig,
-      actionNames,
-      simpleReduxConfig: this.generic,
     })
     const action = ActionInstance.action
-
-    action.simpleRedux = actionMetaData
 
     return action
   }
