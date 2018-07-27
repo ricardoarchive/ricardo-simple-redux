@@ -6,7 +6,7 @@ Reduce amount of boilerplate when building simple actions/reducers
 
 # Why SimpleRedux?
 
-Current structure actions + reducers is overcomplex and requires brings too much bolerplate :wink: .
+Current structure actions + reducers is overcomplex and requires too much bolerplate :wink: .
 
 # Why is it better than what we have today?
 
