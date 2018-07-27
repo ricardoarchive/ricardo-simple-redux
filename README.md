@@ -51,11 +51,11 @@ simpleRedux.actionFactory(type, config)
 
 Config parameters:
 
-- `needsUpdate: Function => boolean` - if function will return `false` action won't be executed. Handy in i.e. `RouteActionComponent` to prevent action infinite loop.
-- `action: Function|Object` - a factory function or update obect. Whatherwer will be returned by action will be automatically dispatched on the store. Available parameters: `getState, api, dispatch`
+- `needsUpdate: (...any) => (getState: Function) => boolean` - if function will return `false` action won't be executed. Handy in i.e. `RouteActionComponent` to prevent action infinite loop.
+- `action: Objec t| (...any) => (getState: Function, dispatch: Function, ...any) => Promise<any> | any` - a factory function or update obect. Whatherwer will be returned by action will be automatically dispatched on the store. Available parameters: `{ getState, dispatch }` and all extra params added to thunk
 - `before: Object|false` - optional will be dispatched on the state before the action. Good if you need to display a preloader when you want to call an async action. If value is `false` then `before` method from constructor config won't be dispatched.
 - `after: Object|false` - optional will be dispatched on the state before the action. Good if you need to hide a preloader when you want to call an async action. If value is `false` then `after` method from constructor config won't be dispatched.
-- `error: Function` - optional will be dispatched if action will throw an error. If value is `false` then `error` method from constructor config won't be dispatched.
+- `error: ({error: Function, dispatch: Furnction, getState: Function, ...ActionParams:any}) => Object` - optional will be dispatched if action will throw an error. If value is `false` then `error` method from constructor config won't be dispatched.
 
 # Examples
 
@@ -73,11 +73,11 @@ Complex action:
 
 ```javascript
 export const getData = simpleRedux.actionFactory('component/get', {
-  needsUpdate: (id: number) => state => state.component.userId !== id,
+  needsUpdate: (id) => state => state.component.userId !== id,
   before: { load: true },
   after: { load: false },
-  error: e => ({ error: error.message }),
-  action: (id: number) => async (getState: Function, api: Axios, dispatch: Function) => {
+  error: ({ error, getState, dispatch, id }) => ({ error: error.message }),
+  action: (id: number) => async ({ getState, dispatch, api /* whathever you add to thunk */}) => {
     dispatch({ somethingExotic: id }) // if needed ...
 
     const response = await api.get('url')
@@ -112,7 +112,7 @@ const initialState = {}
 
 const before = { load: true }
 const after = { load: false }
-const error = err => ({ error: error.toSting() })
+const error = ({ error, getState, dispatch, id }) => ({ error: error.toSting() })
 
 const simpleRedux = new SimpleRedux({ initialState, before, after, error })
 
@@ -123,11 +123,10 @@ export const doSomething = simpleRedux.actionFactory('component/clear', {
 export default const reducer = simpleRedux.reducer
 ```
 
-# Additional properties of action returned by action factory:
+# Additional properties of action returned by action factory (`simpleRedux.actionFactory(/*...*/).simpleRedux`):
 
 ```javascript
 export type SRThunkAction = {
-  (): void,
   actionNames: {
     success: string,
     error?: string,
@@ -151,8 +150,8 @@ export const getData = simpleRedux.actionFactory('component/get', {
   needsUpdate: (id: number) => state => state.component.userId !== id,
   before: { load: true },
   after: { load: false },
-  error: e => ({ error: error.message }),
-  action: (id: number) => async (getState: Function, api: Axios, dispatch: Function) => {
+  error: ({ error, getState, dispatch, id }) => ({ error: error.message }),
+  action: (id: number) => async ({ getState, api, dispatch }) => {
     dispatch({ somethingExotic: id }) // if needed ...
 
     const response = await api.get('url')
@@ -169,11 +168,9 @@ test('create payment action should complete successfully', async () => {
   const action = getData.simpleRedux.action({
     userId: '123',
     amount: 500,
-    paymentMethod: 'bank-transfer-bank',
-    comment: '12341234',
   })
 
-  const received = await action(getState, paymentApi)
+  const received = await action({ getState, api: paymentApi })
   return expect(received).toEqual({ paymentId: 890 })
 })
 ```
