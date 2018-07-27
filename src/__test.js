@@ -143,14 +143,13 @@ describe('SimpleRedux', () => {
     let params = []
 
     const action = simpleRedux.actionFactory('action', {
-      action: () =>
-        function({ getState, dispatch }) {
-          params = [
-            typeof getState === 'function',
-            typeof dispatch === 'function',
-            typeof api === 'function',
-          ]
-        },
+      action: () => ({ getState, dispatch }) => {
+        params = [
+          typeof getState === 'function',
+          typeof dispatch === 'function',
+          typeof api === 'function',
+        ]
+      },
     })
 
     await store.dispatch(action())
