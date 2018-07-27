@@ -2,32 +2,29 @@
 
 Reduce amount of boilerplate when building simple actions/reducers
 
+[![wercker status](https://app.wercker.com/status/3e889c000abf9133d8dad2aed855fab3/s/ "wercker status")](https://app.wercker.com/project/byKey/3e889c000abf9133d8dad2aed855fab3)
+
 # Why SimpleRedux?
 
-It takes way too much time and code to build a simple service (let's call it action :wink: ) which gets a bunch of data from an API and updates a state with data. Thanks to SimpleRedux, the number of lines of code needed to achieve above dropped by ~60% and number of files is reduced by ~50% :wink: .
-
-# Why is it not an redux plugin?
-
-SimpleRedux gives us flexibility to use it when it's handy and doesn't require to rewrite all actions in order to make use of it.
+Current structure actions + reducers is overcomplex and requires brings too much bolerplate :wink: .
 
 # Why is it better than what we have today?
 
 1.  Less code === less bugs
 2.  Less code === less time needed to code (more time for table soccer)
-3.  I love abstractions which makes complex code simple
-4.  We can (almost) get rid of action names
-5.  Shorter development time
+3.  We can (almost) get rid of action names
+4.  More testable
 
 # Installation
 
 `yarn add ricardo-simple-redux`
 
-# Release
+It requires thunk middleware to be used with Redux
+```
+const store = reducer => createStore(reducer, applyMiddleware(thunk))
+```
 
-To release new verion of package
-`yarn npm:publish`
-
-# A bit of documentation
+# Documentation
 
 ```javascript
 new SimpleRedux({initialState [, before, after, error]})
