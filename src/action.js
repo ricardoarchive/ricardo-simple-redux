@@ -28,14 +28,7 @@ class Action {
     type: string,
     { before, after, action, error, needsUpdate }: ActionConfigType,
     actionNames: ActionNames
-  ): ActionMeta => ({
-    actionNames,
-    action,
-    needsUpdate,
-    error,
-    before,
-    after,
-  })
+  ): ActionMeta => ({ actionNames, action, needsUpdate, error, before, after })
 
   ensureThatActionIsAFunction = (action: ActionRecipe) =>
     action instanceof Function ? action : () => () => action
@@ -59,11 +52,8 @@ class Action {
       params: any,
     }) => {
       // $FlowFixMe in constructor we ensure that if action is an object it will be converted to function which will return that object
-      const update = await action(...params)({ getState, dispatch, ...rest })
-      dispatch({
-        type: actionNames.success,
-        update,
-      })
+      const update = await action(...params)({ getState, dispatch }, ...rest)
+      dispatch({ type: actionNames.success, update })
     },
     after: ({ dispatch }: { dispatch: Function }) => {
       if (after) dispatch({ update: after, type: actionNames.after })
@@ -93,13 +83,13 @@ class Action {
   }
 
   action = (...params: any) => async (dispatch: Function, getState: Function, ...rest: any) => {
-    const isUnique = this.isUnique(getState, ...params)
+    const isUnique = this.isUnique({ ...params }, getState)
     if (!isUnique) return Promise.resolve()
     this.dispatch.before({ dispatch })
     try {
       await this.dispatch.action({ params, getState, dispatch, rest })
     } catch (err) {
-      this.dispatch.error({ dispatch, getState, rest, err })
+      this.dispatch.error({ dispatch, getState, err, ...params }, ...rest)
     }
 
     this.dispatch.after({ dispatch })
