@@ -1,11 +1,9 @@
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
-import axios from 'axios'
 import SimpleRedux from './'
 
-const createTestStore = reducers => {
-  const axiosInstance = axios.create({})
-  return createStore(reducers, applyMiddleware(thunk.withExtraArgument(axiosInstance)))
+const createTestStore = reducer => {
+  return createStore(reducer, applyMiddleware(thunk))
 }
 
 describe('SimpleRedux', () => {
@@ -32,19 +30,25 @@ describe('SimpleRedux', () => {
   })
 
   test('should trigger action and dispatch before and after from config', async () => {
-    const simpleRedux = new SimpleRedux(defaultConfig)
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
+    const store = createTestStore(simpleRedux.reducer)
 
     const action = simpleRedux.actionFactory('action', {
       action: number => () => ({ action: number }),
     })
-    const store = createTestStore(simpleRedux.reducer)
+
     await store.dispatch(action(24))
 
     expect(store.getState()).toEqual({ action: 24, after: false, before: true, test: true })
   })
 
   test('should dispatch error', async () => {
-    const simpleRedux = new SimpleRedux(defaultConfig)
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
+    const store = createTestStore(simpleRedux.reducer)
 
     const action = simpleRedux.actionFactory('action', {
       action: () => () => {
@@ -52,21 +56,20 @@ describe('SimpleRedux', () => {
       },
     })
 
-    const store = createTestStore(simpleRedux.reducer)
-
     await store.dispatch(action())
 
     expect(store.getState()).toEqual({ error: true, after: false, before: true, test: true })
   })
 
   test('should dispatch update', async () => {
-    const simpleRedux = new SimpleRedux({ initialState: { initial: true } })
+    const simpleRedux = new SimpleRedux({
+      ...{ initialState: { initial: true } },
+    })
+    const store = createTestStore(simpleRedux.reducer)
 
     const action = simpleRedux.actionFactory('action', {
       action: value => () => ({ update: value }),
     })
-
-    const store = createTestStore(simpleRedux.reducer)
 
     await store.dispatch(action('update'))
 
@@ -74,7 +77,10 @@ describe('SimpleRedux', () => {
   })
 
   test(`should overwrite default config and don't trigger before`, async () => {
-    const simpleRedux = new SimpleRedux(defaultConfig)
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
+    const store = createTestStore(simpleRedux.reducer)
 
     const action = simpleRedux.actionFactory('action', {
       before: false,
@@ -82,15 +88,15 @@ describe('SimpleRedux', () => {
       after: { after: 2000 },
     })
 
-    const store = createTestStore(simpleRedux.reducer)
-
     await store.dispatch(action('update'))
 
     expect(store.getState()).toEqual({ after: 2000, test: true, update: 'update' })
   })
 
   test(`should prevent from adding more than one action with the same name`, async () => {
-    const simpleRedux = new SimpleRedux(defaultConfig)
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
 
     simpleRedux.actionFactory('action', {
       action: () => () => {},
@@ -110,13 +116,14 @@ describe('SimpleRedux', () => {
   })
 
   test(`should dispatch simple action`, async () => {
-    const simpleRedux = new SimpleRedux(defaultConfig)
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
+    const store = createTestStore(simpleRedux.reducer)
 
     const action = simpleRedux.actionFactory('action', {
       action: { update: 2000 },
     })
-
-    const store = createTestStore(simpleRedux.reducer)
 
     await store.dispatch(action())
 
@@ -124,16 +131,18 @@ describe('SimpleRedux', () => {
   })
 
   test(`should expose additional properties in action.simpleRedux`, async () => {
-    const simpleRedux = new SimpleRedux(defaultConfig)
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
+
+    const actionRecipe = () => () => {}
 
     const action = simpleRedux.actionFactory('action', {
-      action: { update: 2000 },
+      action: actionRecipe,
     })
 
     expect(action.simpleRedux).toEqual({
-      action: {
-        update: 2000,
-      },
+      action: actionRecipe,
       actionNames: {
         after: 'action/after',
         before: 'action/before',
@@ -149,5 +158,17 @@ describe('SimpleRedux', () => {
       error: defaultConfig.error,
       needsUpdate: undefined,
     })
+  })
+
+  test(`should convert and object action to function action`, async () => {
+    const simpleRedux = new SimpleRedux({
+      ...defaultConfig,
+    })
+
+    const action = simpleRedux.actionFactory('action', {
+      action: { update: 2 },
+    })
+
+    expect(action.simpleRedux.action()()).toEqual({ update: 2 })
   })
 })
