@@ -1,5 +1,5 @@
 // @flow
-export type NeedsUpdate = (...any) => (...any) => boolean
+export type NeedsUpdate = (...any) => (state: {}) => boolean
 
 export type ActionParams = { getState: Function, dispatch: Function, ...any }
 
@@ -17,7 +17,9 @@ export type ActionNames = {
 export type AdditionalConfigOptions = {
   before?: false | {},
   after?: false | {},
-  error?: false | (({ error: any, ...ActionParams }) => any),
+  error?:
+    | false
+    | (({ error: any, getState: Function, dispatch: Function, ...ActionParams }) => any),
 }
 
 export type ActionConfigType = {
