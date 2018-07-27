@@ -82,14 +82,17 @@ class Action {
     return !uniqueIdFunction || uniqueIdFunction(...params)(getState())
   }
 
-  action = (...params: any) => async (dispatch: Function, getState: Function, ...rest: any) => {
+  action = (...params: any) => async (
+    { dispatch, getState }: { dispatch: Function, getState: Function },
+    ...rest: any
+  ) => {
     const isUnique = this.isUnique({ ...params }, getState)
     if (!isUnique) return Promise.resolve()
     this.dispatch.before({ dispatch })
     try {
       await this.dispatch.action({ params, getState, dispatch, rest })
     } catch (err) {
-      this.dispatch.error({ dispatch, getState, err, ...params }, ...rest)
+      this.dispatch.error({ dispatch, getState, err, ...params, rest })
     }
 
     this.dispatch.after({ dispatch })
