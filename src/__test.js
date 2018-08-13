@@ -143,7 +143,7 @@ describe('SimpleRedux', () => {
     let params = []
 
     const action = simpleRedux.actionFactory('action', {
-      action: () => ({ getState, dispatch }) => {
+      action: () => (getState, dispatch) => {
         params = [
           typeof getState === 'function',
           typeof dispatch === 'function',

@@ -43,16 +43,16 @@ class Action {
     action: async ({
       getState,
       dispatch,
-      rest,
+      thunkParams,
       params,
     }: {
       dispatch: Function,
       getState: Function,
-      rest: any,
+      thunkParams: any,
       params: any,
     }) => {
       // $FlowFixMe in constructor we ensure that if action is an object it will be converted to function which will return that object
-      const update = await action(...params)({ getState, dispatch }, ...rest)
+      const update = await action(...params)(getState, ...thunkParams, dispatch)
       dispatch({ type: actionNames.success, update })
     },
     after: ({ dispatch }: { dispatch: Function }) => {
@@ -62,15 +62,20 @@ class Action {
       err,
       dispatch,
       getState,
-      rest,
+      thunkParams,
+      params,
     }: {
       err: any,
       dispatch: Function,
       getState: Function,
-      rest: any,
+      thunkParams: any,
+      params: any,
     }) => {
       if (error) {
-        dispatch({ update: error({ err, getState, dispatch, ...rest }), type: actionNames.error })
+        dispatch({
+          update: error(err, getState, ...thunkParams, dispatch, params),
+          type: actionNames.error,
+        })
       } else {
         throw err
       }
@@ -83,16 +88,17 @@ class Action {
   }
 
   action = (...params: any) => async (
-    { dispatch, getState }: { dispatch: Function, getState: Function },
-    ...rest: any
+    dispatch: Function,
+    getState: Function,
+    ...thunkParams: any
   ) => {
     const isUnique = this.isUnique({ ...params }, getState)
     if (!isUnique) return Promise.resolve()
     this.dispatch.before({ dispatch })
     try {
-      await this.dispatch.action({ params, getState, dispatch, rest })
+      await this.dispatch.action({ params, getState, dispatch, thunkParams })
     } catch (err) {
-      this.dispatch.error({ dispatch, getState, err, ...params, rest })
+      this.dispatch.error({ dispatch, getState, err, params, thunkParams })
     }
 
     this.dispatch.after({ dispatch })

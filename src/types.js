@@ -1,9 +1,9 @@
 // @flow
 export type NeedsUpdate = (...any) => (state: {}) => boolean
 
-export type ActionParams = { getState: Function, dispatch: Function }
-
-export type ActionRecipe = (...any) => (ActionParams, ...any) => Promise<any> | any
+export type ActionRecipe = (
+  ...any
+) => (getState: Function, api: Function, dispatch: Function) => Promise<any> | any
 
 export type ActionNames = {
   success: string,
@@ -15,7 +15,7 @@ export type ActionNames = {
 export type AdditionalConfigOptions = {
   before?: false | {},
   after?: false | {},
-  error?: false | (({ error: any, ...ActionParams }, ...any) => any),
+  error?: false | ((...any) => any),
 }
 
 export type ActionConfigType = {
@@ -23,7 +23,7 @@ export type ActionConfigType = {
   needsUpdate?: NeedsUpdate,
 } & AdditionalConfigOptions
 
-export type Config = { initialState: Object } & AdditionalConfigOptions & ActionParams
+export type Config = { initialState: Object } & AdditionalConfigOptions
 
 export type ActionMeta = { actionNames: ActionNames } & ActionConfigType
 
