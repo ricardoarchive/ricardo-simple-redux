@@ -35,8 +35,8 @@ Constructor parameters:
 
 - `initialState: Object` - this is an initial state it will be used in reducer method
   TODO: before and after should accept functions too
-- `before: Object` - optional will be dispatched on the state before the action. Good if you need to display a preloader when you want to call an async action.
-- `after: Object` - optional will be dispatched on the state before the action. Good if you need to hide a preloader when you want to call an async action.
+- `before: Object|Function` - optional will be dispatched on the state before the action. Good if you need to display a preloader when you want to call an async action.
+- `after: Object|Function` - optional will be dispatched on the state before the action. Good if you need to hide a preloader when you want to call an async action.
 - `error: Function` - optional will be dispatched if action will throw an error
 
 ```javascirpt
@@ -56,8 +56,8 @@ Config parameters:
 - `needsUpdate: (...any) => (getState: Function) => boolean` - if function will return `false` action won't be executed. Handy in i.e. `RouteActionComponent` to prevent action infinite loop.
   // TODO: params should be wrapped in an Object => to be added in V5
 - `action: Object | (...any) => (getState: Function, ...thunkAdditionalParams: any, dispatch: Function) => Promise<any> | any` - a factory function or update obect. Whatherwer will be returned by action will be automatically dispatched on the store. Available parameters: `{ getState, dispatch }` and all extra params added to thunk
-- `before: Object|false` - optional will be dispatched on the state before the action. Good if you need to display a preloader when you want to call an async action. If value is `false` then `before` method from constructor config won't be dispatched.
-- `after: Object|false` - optional will be dispatched on the state before the action. Good if you need to hide a preloader when you want to call an async action. If value is `false` then `after` method from constructor config won't be dispatched.
+- `before: Object|false|Function` - optional will be dispatched on the state before the action. Good if you need to display a preloader when you want to call an async action. If value is `false` then `before` method from constructor config won't be dispatched.
+- `after: Object|false|Function` - optional will be dispatched on the state before the action. Good if you need to hide a preloader when you want to call an async action. If value is `false` then `after` method from constructor config won't be dispatched.
 - `error: (error: Function, getState: Function, ...thunkAdditionalParams: any, dispatch: Function, params:any) => Object` - optional will be dispatched if action will throw an error. If value is `false` then `error` method from constructor config won't be dispatched.
 
 # Examples

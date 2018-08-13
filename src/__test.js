@@ -8,8 +8,8 @@ const createTestStore = reducer =>
 
 describe('SimpleRedux', () => {
   const initialState = { test: true }
-  const before = { before: true }
-  const after = { after: false }
+  const before = () => ({ before: true })
+  const after = () => ({ after: false })
   const error = () => ({ error: true })
   const defaultConfig = { initialState, before, after, error }
 
@@ -120,8 +120,8 @@ describe('SimpleRedux', () => {
         error: 'action/error',
         success: 'action',
       },
-      after: { after: false },
-      before: { before: true },
+      after: defaultConfig.after,
+      before: defaultConfig.before,
       error: defaultConfig.error,
       needsUpdate: undefined,
     })

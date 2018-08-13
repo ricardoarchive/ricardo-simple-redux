@@ -6,10 +6,12 @@ class Action {
   config = {}
   type = ''
   constructor({ type, config }: { type: string, config: ActionConfigType }) {
-    const { action } = config
+    const { action, before, after } = config
 
     this.config = config
-    this.config.action = this.ensureThatActionIsAFunction(action)
+    this.config.action = this.ensureThatActionIsAFunctionFactory(action)
+    before && (this.config.before = this.ensureThatActionIsAFunction(before))
+    after && (this.config.after = this.ensureThatActionIsAFunction(after))
     this.type = type
 
     const actionNames = this.getActionNames(type, config)
@@ -30,15 +32,27 @@ class Action {
     actionNames: ActionNames
   ): ActionMeta => ({ actionNames, action, needsUpdate, error, before, after })
 
-  ensureThatActionIsAFunction = (action: ActionRecipe) =>
+  ensureThatActionIsAFunctionFactory = (action: ActionRecipe) =>
     action instanceof Function ? action : () => () => action
+
+  ensureThatActionIsAFunction = (update: any) =>
+    update instanceof Function ? update : () => update
 
   dispatchFactory = (
     { before, action, after, error }: ActionConfigType,
     actionNames: ActionNames
   ) => ({
-    before: ({ dispatch }: { dispatch: Function }) => {
-      if (before) dispatch({ update: before, type: actionNames.before })
+    before: ({
+      dispatch,
+      getState,
+    }: {
+      dispatch: Function,
+      getState: Function,
+      params: Function,
+    }) => {
+      if (!before) return
+      const update = before(getState, dispatch)
+      dispatch({ update, type: actionNames.before })
     },
     action: async ({
       getState,
@@ -55,8 +69,17 @@ class Action {
       const update = await action(...params)(getState, ...thunkParams, dispatch)
       dispatch({ type: actionNames.success, update })
     },
-    after: ({ dispatch }: { dispatch: Function }) => {
-      if (after) dispatch({ update: after, type: actionNames.after })
+    after: ({
+      dispatch,
+      getState,
+    }: {
+      dispatch: Function,
+      getState: Function,
+      params: Function,
+    }) => {
+      if (!after) return
+      const update = after(getState, dispatch)
+      dispatch({ update, type: actionNames.after })
     },
     error: ({
       err,
@@ -94,14 +117,14 @@ class Action {
   ) => {
     const isUnique = this.isUnique({ ...params }, getState)
     if (!isUnique) return Promise.resolve()
-    this.dispatch.before({ dispatch })
+    this.dispatch.before({ dispatch, getState })
     try {
       await this.dispatch.action({ params, getState, dispatch, thunkParams })
     } catch (err) {
       this.dispatch.error({ dispatch, getState, err, params, thunkParams })
     }
 
-    this.dispatch.after({ dispatch })
+    this.dispatch.after({ dispatch, getState })
   }
 }
 
