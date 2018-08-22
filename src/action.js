@@ -42,14 +42,7 @@ class Action {
     { before, action, after, error }: ActionConfigType,
     actionNames: ActionNames
   ) => ({
-    before: ({
-      dispatch,
-      getState,
-    }: {
-      dispatch: Function,
-      getState: Function,
-      params: Function,
-    }) => {
+    before: ({ dispatch, getState }: { dispatch: Function, getState: Function }) => {
       if (!before) return
       const update = before(getState, dispatch)
       dispatch({ update, type: actionNames.before })
@@ -69,14 +62,7 @@ class Action {
       const update = await action(...params)(getState, ...thunkParams, dispatch)
       dispatch({ type: actionNames.success, update })
     },
-    after: ({
-      dispatch,
-      getState,
-    }: {
-      dispatch: Function,
-      getState: Function,
-      params: Function,
-    }) => {
+    after: ({ dispatch, getState }: { dispatch: Function, getState: Function }) => {
       if (!after) return
       const update = after(getState, dispatch)
       dispatch({ update, type: actionNames.after })

@@ -13,9 +13,9 @@ export type ActionNames = {
 }
 
 export type AdditionalConfigOptions = {
-  before?: false | {},
-  after?: false | {},
-  error?: false | ((...any) => any),
+  before?: any,
+  after?: any,
+  error?: any,
 }
 
 export type ActionConfigType = {
