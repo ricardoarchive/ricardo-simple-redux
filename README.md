@@ -161,7 +161,7 @@ export const getData = simpleRedux.actionFactory('component/get', {
     api /* an extra param from thunk config */,
     dispatch
   ) => {
-    dispatch({ somethingExotic: id }) // if needed ...
+    dispatch({ type: 'items/update', somethingExotic: id }) // if needed ...
 
     const response = await api.get('url')
 
