@@ -151,6 +151,7 @@ simpleRedux.actionFactory(/*...*/).simpleRedux = {
 For testing you might want to export your action config separtately so you don't have to relly on mocking `dispatch` function
 
 ```javascript
+export const setfilter = simpleRedux.actionFactory('component/setFilter', { action: { status: 'open' } })
 export const getData = simpleRedux.actionFactory('component/get', {
   needsUpdate: (id: number) => state => state.component.userId !== id,
   before: { load: true },
@@ -161,7 +162,7 @@ export const getData = simpleRedux.actionFactory('component/get', {
     api /* an extra param from thunk config */,
     dispatch
   ) => {
-    dispatch(simpleRedux.actionFactory({ id })) // if needed ...
+    dispatch(setfilter({ id })) // if needed ...
 
     const response = await api.get('url')
 
