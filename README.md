@@ -55,7 +55,7 @@ Config parameters:
 
 - `needsUpdate: (...any) => (getState: Function) => boolean` - if function will return `false` action won't be executed. Handy in i.e. `RouteActionComponent` to prevent action infinite loop.
   // TODO: params should be wrapped in an Object => to be added in V5
-- `action: Object | (...any) => (getState: Function, ...thunkAdditionalParams: any, dispatch: Function) => Promise<any> | any` - a factory function or update obect. Whatherwer will be returned by action will be automatically dispatched on the store. Available parameters: `{ getState, dispatch }` and all extra params added to thunk
+- `action: Object | (...any) => (getState: Function, ...thunkAdditionalParams: any, dispatch: Function) => Promise<any> | any` - a factory function or update obect. Whatherwer will be returned by action will be automatically dispatched on the store. Available parameters: `(getState, /* whatever thunk */, dispatch)` and all extra params added to thunk
 - `before: Object|false|Function` - optional will be dispatched on the state before the action. Good if you need to display a preloader when you want to call an async action. If value is `false` then `before` method from constructor config won't be dispatched.
 - `after: Object|false|Function` - optional will be dispatched on the state before the action. Good if you need to hide a preloader when you want to call an async action. If value is `false` then `after` method from constructor config won't be dispatched.
 - `error: (error: Function, getState: Function, ...thunkAdditionalParams: any, dispatch: Function, params:any) => Object` - optional will be dispatched if action will throw an error. If value is `false` then `error` method from constructor config won't be dispatched.
@@ -80,7 +80,7 @@ export const getData = simpleRedux.actionFactory('component/get', {
   before: { load: true },
   after: { load: false },
   error: ({ error, getState, dispatch, id }) => ({ error: error.message }),
-  action: (id: number) => async ({ getState, dispatch }, api /* whatever you add to thunk */) => {
+  action: (id: number) => async (getState, api /* whatever you add to thunk */, dispatch) => {
     dispatch({ somethingExotic: id }) // if needed ...
 
     const response = await api.get('url')
@@ -151,6 +151,7 @@ simpleRedux.actionFactory(/*...*/).simpleRedux = {
 For testing you might want to export your action config separtately so you don't have to relly on mocking `dispatch` function
 
 ```javascript
+export const setfilter = simpleRedux.actionFactory('component/setFilter', { action: { status: 'open' } })
 export const getData = simpleRedux.actionFactory('component/get', {
   needsUpdate: (id: number) => state => state.component.userId !== id,
   before: { load: true },
@@ -161,7 +162,7 @@ export const getData = simpleRedux.actionFactory('component/get', {
     api /* an extra param from thunk config */,
     dispatch
   ) => {
-    dispatch({ somethingExotic: id }) // if needed ...
+    dispatch(setfilter({ id })) // if needed ...
 
     const response = await api.get('url')
 
