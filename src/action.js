@@ -10,8 +10,15 @@ class Action {
 
     this.config = config
     this.config.action = this.ensureThatActionIsAFunctionFactory(action)
-    before && (this.config.before = this.ensureThatActionIsAFunction(before))
-    after && (this.config.after = this.ensureThatActionIsAFunction(after))
+
+    if (before) {
+      this.config.before = this.ensureThatActionIsAFunction(before)
+    }
+
+    if (after) {
+      this.config.after = this.ensureThatActionIsAFunction(after)
+    }
+
     this.type = type
 
     const actionNames = this.getActionNames(type, config)
@@ -101,7 +108,7 @@ class Action {
     getState: Function,
     ...thunkParams: any
   ) => {
-    const isUnique = this.isUnique({ ...params }, getState)
+    const isUnique = this.isUnique(getState, { ...params })
     if (!isUnique) return Promise.resolve()
     this.dispatch.before({ dispatch, getState })
     try {

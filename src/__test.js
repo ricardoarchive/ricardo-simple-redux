@@ -156,4 +156,23 @@ describe('SimpleRedux', () => {
 
     expect(params).toEqual([true, true, true])
   })
+
+  test('action should not execute if needsUpdate is defined', async () => {
+    const simpleRedux = new SimpleRedux({ ...defaultConfig })
+    const store = createTestStore(simpleRedux.reducer)
+
+    const action = simpleRedux.actionFactory('action', {
+      needsUpdate: () => ({ test }) => {
+        expect(test).toBe(true)
+        return false
+      },
+      action: () => () => ({
+        test: false,
+      }),
+    })
+
+    await store.dispatch(action())
+
+    expect(store.getState()).toEqual({ test: true })
+  })
 })
