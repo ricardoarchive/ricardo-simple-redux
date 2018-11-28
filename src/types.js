@@ -1,5 +1,5 @@
 // @flow
-export type NeedsUpdate = (...any) => (state: {}) => boolean
+export type NeedsUpdate = (...any) => (state: Object) => boolean
 
 export type ActionRecipe = (
   ...any
