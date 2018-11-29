@@ -108,7 +108,7 @@ class Action {
     getState: Function,
     ...thunkParams: any
   ) => {
-    const isUnique = this.isUnique(getState, { ...params })
+    const isUnique = this.isUnique(getState, ...params)
     if (!isUnique) return Promise.resolve()
     this.dispatch.before({ dispatch, getState })
     try {

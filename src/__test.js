@@ -175,4 +175,21 @@ describe('SimpleRedux', () => {
 
     expect(store.getState()).toEqual({ test: true })
   })
+
+  test('params can be passed to needsUpdate', async () => {
+    const simpleRedux = new SimpleRedux({ ...defaultConfig })
+    const store = createTestStore(simpleRedux.reducer)
+
+    const action = simpleRedux.actionFactory('action', {
+      needsUpdate: ({ toubi }) => () => {
+        expect(toubi).toBe(true)
+        return false
+      },
+      action: () => () => ({
+        test: false,
+      }),
+    })
+
+    await store.dispatch(action({ toubi: true }))
+  })
 })
