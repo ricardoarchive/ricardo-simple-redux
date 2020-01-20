@@ -1,5 +1,4 @@
 // @flow
-import 'babel-polyfill'
 import Action from './action'
 import type { ActionConfigType, Config, AdditionalConfigOptions, SRThunkAction } from './types'
 
