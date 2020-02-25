@@ -6,6 +6,9 @@
     "transform-class-properties",
     "transform-flow-strip-types",
     "transform-object-rest-spread",
-    "transform-decorators-legacy"
+    "transform-decorators-legacy",
+    ["transform-runtime", {
+      "regenerator": true
+    }]
   ]
 }
