@@ -1,0 +1,42 @@
+version: 2.1
+
+commands:
+  conf_npmrc:
+    description: configure private npm
+    steps:
+      - run:
+          command: |
+            echo -e "${NPM_RC}" > .npmrc
+  install:
+    description: install project
+    steps:
+      - run:
+          command: |
+            make install
+  build:
+    description: build project
+    steps:
+      - run:
+          command: |
+            make build
+  test:
+    description: test project
+    steps:
+      - run:
+          command: |
+            make test
+
+jobs:
+  build:
+    docker:
+      - image: node:8.11
+    steps:
+      - checkout
+      - conf_npmrc
+      - install
+      - build
+      - test
+
+workflow:
+  build:
+    - build
