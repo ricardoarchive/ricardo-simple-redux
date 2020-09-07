@@ -2,7 +2,7 @@
 
 Reduce amount of boilerplate when building simple actions/reducers
 
-[![wercker status](https://app.wercker.com/status/3e889c000abf9133d8dad2aed855fab3/s/ 'wercker status')](https://app.wercker.com/project/byKey/3e889c000abf9133d8dad2aed855fab3)
+[![CircleCI](https://circleci.com/gh/ricardo-ch/ricardo-simple-redux/tree/master.svg?style=shield&circle-token=08b1a97ae5d927c48d1f2bd6bdbf3d82335e8139)](https://circleci.com/gh/ricardo-ch/ricardo-simple-redux/tree/master)
 
 # Why SimpleRedux?
 
