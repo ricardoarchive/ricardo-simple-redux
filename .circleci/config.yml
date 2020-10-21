@@ -4,46 +4,49 @@ commands:
   conf_npmrc:
     description: configure private npm
     steps:
-      - run:
-          command: |
-            echo -e "${NPM_RC}" | base64 -d > .npmrc
+    - run:
+        command: |
+          echo -e "${NPM_RC}" | base64 -d > .npmrc
   install:
     description: install project
     steps:
-      - run:
-          command: |
-            make install
+    - run:
+        command: |
+          make install
   build:
     description: build project
     steps:
-      - run:
-          command: |
-            make build
+    - run:
+        command: |
+          make build
   test:
     description: test project
     steps:
-      - run:
-          command: |
-            make test
+    - run:
+        command: |
+          make test
 
 jobs:
   build_and_test:
     docker:
-      - image: node:8.11
+    - image: node:8.11
+      auth:
+        username: $DOCKER_HUB_USERNAME
+        password: $DOCKER_HUB_PASSWORD
     steps:
-      - checkout
-      - conf_npmrc
-      - install
-      - build
-      - test
+    - checkout
+    - conf_npmrc
+    - install
+    - build
+    - test
 
 workflows:
   version: 2
   build_and_test_dev:
     jobs:
-      - build_and_test:
-          context: dev
+    - build_and_test:
+        context: dev
   build_and_test_prod:
     jobs:
-      - build_and_test:
-          context: prod
+    - build_and_test:
+        context: prod
